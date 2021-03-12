@@ -88,8 +88,6 @@ def _setup_logging():
             log.warning("Failed to ensure that stderr is line buffered", exc_info=_stderr_buffer_result)
         log.warning("Some stack traces may not appear because of this.")
 
-    del _stderr_buffer_result, _stdout_buffer_result
-
 
 # Singleton scheduler instance
 # NB this cheekily ensures a singleton since we're replacing the reference
