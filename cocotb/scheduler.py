@@ -429,6 +429,8 @@ class Scheduler:
                         self.log.debug(
                             "No coroutines waiting on trigger that fired: %s" %
                             str(trigger))
+
+                    del trigger
                     continue
 
                 if _debug:
@@ -451,12 +453,23 @@ class Scheduler:
                     if _debug:
                         self.log.debug("Scheduled coroutine %s" % (coro._coro.__qualname__))
 
+                    # remove our reference to the objects at the end of each loop,
+                    # to try and avoid them being destroyed at a weird time (as
+                    # happened in gh-957)
+                    del coro
+
                 # Schedule may have queued up some events so we'll burn through those
                 while self._pending_events:
                     if _debug:
                         self.log.debug("Scheduling pending event %s" %
                                        (str(self._pending_events[0])))
                     self._pending_events.pop(0).set()
+
+                # remove our reference to the objects at the end of each loop,
+                # to try and avoid them being destroyed at a weird time (as
+                # happened in gh-957)
+                del trigger
+                del scheduling
 
             # no more pending triggers
             self._check_termination()
